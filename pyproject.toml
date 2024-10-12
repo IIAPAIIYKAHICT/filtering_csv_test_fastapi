@@ -35,7 +35,6 @@ extend-ignore = [
     "G004",
     # Consider {expression} instead of string join.
     "FLY002",
-    # TODO: Remove after this will be implemented in MyPy.
     # Type alias {name} uses TypeAlias annotation instead of the type keyword
     "UP040",
     # TODOs
@@ -43,7 +42,7 @@ extend-ignore = [
     "TD002",
     # Link to issue
     "TD003",
-    # Line contains a TODO or related comment
+    # Line contains a
     "FIX",
     # Args and kwargs are not used and not annotated
     "ANN002",
