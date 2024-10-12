@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Chat with Vacancies</title>
+    <style>
+      .chat-container {
+        width: 50%;
+        margin: 0 auto;
+        padding: 10px;
+        border: 1px solid #ccc;
+      }
+      .chat-message {
+        margin: 5px 0;
+      }
+      .chat-user {
+        font-weight: bold;
+        color: blue;
+      }
+      .chat-bot {
+        font-weight: bold;
+        color: green;
+      }
+      .chat-source-docs {
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-left: 3px solid #ccc;
+      }
+      .chat-source-docs-header {
+        font-weight: bold;
+        color: #555;
+      }
+      .chat-source-doc {
+        font-size: 0.9em;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chat-container">
+      <h2>Chat with Vacancies</h2>
+
+      <!-- История сообщений -->
+      <div class="chat-history">
+        {% for entry in history %}
+        <div class="chat-message">
+          <div class="chat-user">You: {{ entry.message }}</div>
+          <div class="chat-bot">Vacancy: {{ entry.response }}</div>
+
+          <!-- Исходные документы -->
+          <div class="chat-source-docs">
+            <div class="chat-source-docs-header">Source Documents:</div>
+            <div class="chat-source-doc">
+              {{ entry.source_documents | safe }}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Форма для отправки сообщения -->
+      <form method="post" action="/chat">
+        <label for="message">Your question:</label>
+        <input type="text" id="message" name="message" required />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </body>
+</html>

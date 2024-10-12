@@ -32,18 +32,6 @@ repos:
         #            --only=dev,
         #          ]
 
-  - repo: https://github.com/sourcery-ai/sourcery
-    rev: v1.23.0
-    # Advanced refactorings for Python.
-    # Hide it if you can't use it.
-    hooks:
-      - id: sourcery
-        # The best way to use Sourcery in a pre-commit hook:
-        # * review only changed lines:
-        # * omit the summary
-        #  args: [ --diff=git diff HEAD, --no-summary, --fix ]
-        args: [--no-summary, --fix]
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     # A collection of git hooks.

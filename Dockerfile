@@ -24,11 +24,12 @@ RUN pip install --upgrade pip && \
 
 COPY --chown=${USER} main.py main.py
 COPY --chown=${USER} ./dataset dataset
-
+COPY --chown=${USER} ./templates templates
+COPY --chown=${USER} ./model model
+COPY --chown=${USER} ./parsing_scripts parsing_scripts
+COPY --chown=${USER} ./utils utils
 USER ${USER}
 
 ENTRYPOINT ["uvicorn", "main:app"]
 
 CMD ["--help"]
-
-#HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD curl --fail http://localhost:5000/health || exit 1

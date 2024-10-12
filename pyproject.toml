@@ -8,6 +8,17 @@ authors = ["IIAPAIIYKAHICT <adamThomasMoran124@gmail.com>"]
 python = "^3.12"
 fastapi = "^0.115.0"
 uvicorn = "^0.31.1"
+pandas = "^2.2.3"
+jinja2 = "^3.1.4"
+langchain-openai = "^0.2.2"
+selenium = "^4.25.0"
+langchain-qdrant = "^0.1.4"
+beautifulsoup4 = "^4.12.3"
+types-requests = "^2.32.0.20240914"
+types-beautifulsoup4 = "^4.12.0.20240907"
+itsdangerous = "^2.2.0"
+langchain = "^0.3.3"
+python-multipart = "^0.0.12"
 
 
 [build-system]
