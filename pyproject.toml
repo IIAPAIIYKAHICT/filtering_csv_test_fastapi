@@ -1,0 +1,73 @@
+[tool.poetry]
+name = "filtering-csv-test"
+version = "0.1.0"
+description = ""
+authors = ["IIAPAIIYKAHICT <adamThomasMoran124@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.0"
+uvicorn = "^0.31.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 120
+
+extend-exclude = [
+]
+
+[tool.ruff.lint]
+extend-select = [
+    "ALL",
+]
+extend-ignore = [
+    # Missing docstring.
+    "D1",
+    # flake8-future-annotations.
+    "FA",
+    # Missing type annotation for self and cls.
+    "ANN1",
+    # f-strings to format logging messages.
+    "G004",
+    # Consider {expression} instead of string join.
+    "FLY002",
+    # TODO: Remove after this will be implemented in MyPy.
+    # Type alias {name} uses TypeAlias annotation instead of the type keyword
+    "UP040",
+    # TODOs
+    # Author.
+    "TD002",
+    # Link to issue
+    "TD003",
+    # Line contains a TODO or related comment
+    "FIX",
+    # Args and kwargs are not used and not annotated
+    "ANN002",
+    "ANN003",
+]
+
+task-tags = [
+    "TODO",
+    "FIXME",
+    "HACK",
+    "XXX",
+    "[",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+# https://betterprogramming.pub/3-different-docstring-formats-for-python-d27be81e0d68
+
+[tool.ruff.lint.flake8-comprehensions]
+allow-dict-calls-with-keyword-arguments = true
+
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = [
+    # Unused import.
+    "F401",
+]
