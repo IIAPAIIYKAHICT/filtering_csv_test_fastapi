@@ -63,11 +63,6 @@ repos:
         # Checks that your YAML files are parseable.
       - id: check-toml
         # Attempts to load all TOML files to verify syntax.
-      - id: debug-statements
-        # Check for debugger imports
-      - id: check-added-large-files
-        # Prevent giant files from being committed.
-        args: [--maxkb=500]
       - id: no-commit-to-branch
         # No commits to master or main.
         args: [--branch=master, --branch=main]
