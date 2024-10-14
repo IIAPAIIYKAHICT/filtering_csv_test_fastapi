@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 
 import pandas as pd
-from pydantic import SecretStr
 from qdrant_client import QdrantClient
 
 uk_month_to_number = {
