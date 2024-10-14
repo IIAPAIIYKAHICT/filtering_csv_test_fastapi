@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 
@@ -13,52 +14,76 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from utils.utils import categories, parse_uk_date
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("job_parsing.log"),
+        logging.StreamHandler(),
+    ],
+)
+
 
 def quick_parse() -> None:
+    logging.info("Starting job parsing process.")
+
     def fetch_job_data(category: str, headers: dict) -> list:
+        logging.info(f"Fetching job data for category: {category}")
         url = f"https://jobs.dou.ua/vacancies/?category={category}"
-        response = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(response.text, "html.parser")
-        jobs = soup.find_all("li", class_="l-vacancy")
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            soup = BeautifulSoup(response.text, "html.parser")
+            jobs = soup.find_all("li", class_="l-vacancy")
+            logging.info(f"Found {len(jobs)} jobs in category {category}.")
+        except Exception as e:
+            logging.exception(f"Error fetching jobs from {url}: {e!s}")
+            return []
+
         data = []
 
         for job in jobs:
-            date_posted = job.find("div", class_="date").text.strip()
-            parsed_date = parse_uk_date(date_posted)
-            title_tag = job.find("a", class_="vt")
-            job_title = title_tag.text.strip()
-            job_url = title_tag["href"]
-            company_tag = job.find("a", class_="company")
-            company_name = company_tag.text.strip()
-            company_url = company_tag["href"]
-            salary_tag = job.find("span", class_="salary")
-            salary = salary_tag.text.strip() if salary_tag else "Not specified"
-            location_tag = job.find("span", class_="cities")
-            location = location_tag.text.strip() if location_tag else "Location not specified"
-            info_tag = job.find("div", class_="sh-info")
-            short_info = info_tag.text.strip() if info_tag else "No description provided"
+            try:
+                date_posted = job.find("div", class_="date").text.strip()
+                parsed_date = parse_uk_date(date_posted)
+                title_tag = job.find("a", class_="vt")
+                job_title = title_tag.text.strip()
+                job_url = title_tag["href"]
+                company_tag = job.find("a", class_="company")
+                company_name = company_tag.text.strip()
+                company_url = company_tag["href"]
+                salary_tag = job.find("span", class_="salary")
+                salary = salary_tag.text.strip() if salary_tag else "Not specified"
+                location_tag = job.find("span", class_="cities")
+                location = location_tag.text.strip() if location_tag else "Location not specified"
+                info_tag = job.find("div", class_="sh-info")
+                short_info = info_tag.text.strip() if info_tag else "No description provided"
 
-            # Request to fetch full job description
-            job_response = requests.get(job_url, headers=headers, timeout=10)
-            job_soup = BeautifulSoup(job_response.text, "html.parser")
-            full_description_element = job_soup.find("div", class_="b-typo vacancy-section")
-            full_description = (
-                full_description_element.text.strip() if full_description_element else "No full description"
-            )
+                # Request to fetch full job description
+                job_response = requests.get(job_url, headers=headers, timeout=10)
+                job_soup = BeautifulSoup(job_response.text, "html.parser")
+                full_description_element = job_soup.find("div", class_="b-typo vacancy-section")
+                full_description = (
+                    full_description_element.text.strip() if full_description_element else "No full description"
+                )
 
-            data.append(
-                {
-                    "Date Posted": parsed_date,
-                    "Job Title": job_title,
-                    "Job URL": job_url,
-                    "Company Name": company_name,
-                    "Company URL": company_url,
-                    "Salary": salary,
-                    "Location": location,
-                    "Short Info": short_info,
-                    "Full Description": full_description,
-                },
-            )
+                logging.info(f"Parsed job: {job_title} from {company_name}.")
+
+                data.append(
+                    {
+                        "Date Posted": parsed_date,
+                        "Job Title": job_title,
+                        "Job URL": job_url,
+                        "Company Name": company_name,
+                        "Company URL": company_url,
+                        "Salary": salary,
+                        "Location": location,
+                        "Short Info": short_info,
+                        "Full Description": full_description,
+                    },
+                )
+            except Exception as e:
+                logging.exception(f"Error parsing job: {e!s}")
+
             time.sleep(3)  # Sleep to avoid rate limiting
         return data
 
@@ -67,21 +92,34 @@ def quick_parse() -> None:
     }
 
     csv_filename = "all_job_listings.csv"
-    existing_df = pd.read_csv(csv_filename) if os.path.exists(csv_filename) else pd.DataFrame()
+    logging.info(f"Loading existing job data from {csv_filename}.")
+
+    try:
+        existing_df = pd.read_csv(csv_filename) if os.path.exists(csv_filename) else pd.DataFrame()
+    except Exception as e:
+        logging.exception(f"Error reading CSV file: {e!s}")
+        existing_df = pd.DataFrame()
 
     all_data = []
     for category in categories:
         category_data = fetch_job_data(category, headers)
         all_data.extend(category_data)
-        time.sleep(3)  # Sleep to avoid rate limiting
+        time.sleep(3)
+
     new_df = pd.DataFrame(all_data)
 
-    # Combine new data with existing data and remove duplicates
+    logging.info("Combining new data with existing data and removing duplicates.")
     combined_df = pd.concat([existing_df, new_df])
     combined_df = combined_df.drop_duplicates(subset="Job URL", keep="last")
 
-    # Save to CSV
-    combined_df.to_csv(csv_filename, index=False, encoding="utf-8")
+    logging.info(f"Saving combined data to {csv_filename}.")
+    try:
+        combined_df.to_csv(csv_filename, index=False, encoding="utf-8")
+        logging.info("Data successfully saved to CSV.")
+    except Exception as e:
+        logging.exception(f"Error saving data to CSV: {e!s}")
+
+    logging.info("Job parsing process completed successfully.")
 
 
 def full_parse() -> None:

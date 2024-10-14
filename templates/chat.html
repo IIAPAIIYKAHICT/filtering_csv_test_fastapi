@@ -1,69 +1,89 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Chat with Vacancies</title>
-    <style>
-      .chat-container {
-        width: 50%;
-        margin: 0 auto;
-        padding: 10px;
-        border: 1px solid #ccc;
-      }
-      .chat-message {
-        margin: 5px 0;
-      }
-      .chat-user {
-        font-weight: bold;
-        color: blue;
-      }
-      .chat-bot {
-        font-weight: bold;
-        color: green;
-      }
-      .chat-source-docs {
-        margin: 10px 0;
-        padding: 10px;
-        background-color: #f9f9f9;
-        border-left: 3px solid #ccc;
-      }
-      .chat-source-docs-header {
-        font-weight: bold;
-        color: #555;
-      }
-      .chat-source-doc {
-        font-size: 0.9em;
-        color: #333;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="chat-container">
-      <h2>Chat with Vacancies</h2>
+{% extends "base.html" %} {% block title %}Chat{% endblock %} {% block
+page_title %}Chat Room: {{ room_name }}{% endblock %} {% block content %}
+<div class="chat-container">
+  <div class="chat-sidebar">
+    <h3>Chat Rooms</h3>
+    <ul>
+      {% for room in rooms %}
+      <li class="chat-room-item">
+        <a href="/chat/{{ room.room_name }}" class="chat-room-link"
+          >{{ room.room_name }}</a
+        >
+        <form method="post" action="/delete_room" style="display: inline">
+          <input type="hidden" name="room_name" value="{{ room.room_name }}" />
+          <button type="submit" class="btn-delete">Delete</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
 
-      <!-- История сообщений -->
-      <div class="chat-history">
-        {% for entry in history %}
-        <div class="chat-message">
-          <div class="chat-user">You: {{ entry.message }}</div>
-          <div class="chat-bot">Vacancy: {{ entry.response }}</div>
+    <!-- Добавляем форму для создания новой комнаты -->
+    <form method="post" action="/create_room" class="create-room-form">
+      <input
+        type="text"
+        name="room_name"
+        placeholder="Enter room name"
+        required
+      />
+      <button type="submit" class="btn">Create Room</button>
+    </form>
+  </div>
 
-          <!-- Исходные документы -->
-          <div class="chat-source-docs">
-            <div class="chat-source-docs-header">Source Documents:</div>
-            <div class="chat-source-doc">
-              {{ entry.source_documents | safe }}
-            </div>
-          </div>
-        </div>
-        {% endfor %}
+  <div class="chat-main">
+    <div class="chat-messages" id="chat-messages">
+      {% for message in history %}
+      <div class="chat-message user-message">
+        <strong>You:</strong> {{ message.user_message }}
       </div>
-
-      <!-- Форма для отправки сообщения -->
-      <form method="post" action="/chat">
-        <label for="message">Your question:</label>
-        <input type="text" id="message" name="message" required />
-        <button type="submit">Send</button>
-      </form>
+      <div class="chat-message bot-message">
+        <strong>GPT:</strong> {{ message.bot_response | safe }}
+      </div>
+      {% endfor %}
     </div>
-  </body>
-</html>
+
+    <!-- Анимация загрузки -->
+    <div id="loading-spinner" style="display: none">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+
+    <form
+      method="post"
+      action="/chat/{{ room_name }}"
+      class="chat-form"
+      onsubmit="disableSubmitButton()"
+    >
+      <input
+        type="text"
+        name="message"
+        id="user-message"
+        placeholder="Type your message..."
+        class="form-input"
+        required
+      />
+      <button type="submit" id="submit-btn" class="btn">Send</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function disableSubmitButton() {
+    document.getElementById("submit-btn").disabled = true;
+    document.getElementById("loading-spinner").style.display = "flex";
+
+    const userMessage = document.getElementById("user-message").value;
+    const messagesDiv = document.getElementById("chat-messages");
+    const userMessageDiv = document.createElement("div");
+    userMessageDiv.classList.add("chat-message", "user-message");
+    userMessageDiv.innerHTML = `<strong>You:</strong> ${userMessage}`;
+    messagesDiv.appendChild(userMessageDiv);
+
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  window.onload = function () {
+    const chatMessages = document.getElementById("chat-messages");
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  };
+</script>
+{% endblock %}

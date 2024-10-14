@@ -1,12 +1,22 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <title>Main Page</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}My App{% endblock %}</title>
+    <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
-    <h1>Welcome to the Job Application</h1>
-    <p>Choose an option below:</p>
-    <a href="/vacancies"><button>View Vacancies</button></a>
-    <a href="/chat"><button>Chat with Vacancies</button></a>
+    <nav>
+      <ul class="navbar">
+        <li><a href="/">Chat</a></li>
+        <li><a href="/vacancies">Vacancies</a></li>
+      </ul>
+    </nav>
+
+    <div class="content">
+      <h1 class="header">{% block page_title %}{% endblock %}</h1>
+      {% block content %}{% endblock %}
+    </div>
   </body>
 </html>

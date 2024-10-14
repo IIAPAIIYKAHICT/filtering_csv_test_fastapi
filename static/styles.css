@@ -1,0 +1,364 @@
+/* == Общие стили == */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+}
+
+h1,
+.header {
+  text-align: center;
+  margin-top: 20px;
+  color: #333;
+}
+
+.content {
+  padding: 20px;
+  padding-top: 60px; /* Отступ для фиксированного меню навигации */
+}
+
+/* == Навигация == */
+/* Фиксированное меню навигации */
+.navbar {
+  list-style-type: none;
+  background-color: #333;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.navbar li {
+  float: left;
+}
+
+.navbar li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+.navbar li a:hover {
+  background-color: #111;
+}
+
+/* == Унифицированные стили кнопок == */
+.btn {
+  padding: 10px 20px;
+  background-color: #5cb85c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  width: 150px; /* Фиксированная ширина для всех кнопок */
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #4cae4c;
+}
+
+.btn-reset {
+  background-color: #d9534f;
+}
+
+.btn-reset:hover {
+  background-color: #c9302c;
+}
+
+.btn-primary {
+  background-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-delete {
+  background-color: #5cb85c;
+  padding: 5px 10px;
+}
+
+.btn-delete:hover {
+  background-color: #4cae4c;
+}
+
+/* == Чат == */
+.chat-container {
+  display: flex;
+  height: 100vh;
+}
+
+.chat-sidebar {
+  position: fixed;
+  left: 0;
+  top: 60px;
+  width: 20%;
+  background-color: #f4f4f4;
+  padding: 20px;
+  height: calc(100vh - 60px);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.chat-sidebar h3 {
+  margin-top: 0;
+}
+
+.chat-sidebar ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.chat-sidebar ul li {
+  margin-bottom: 10px;
+}
+
+.chat-sidebar ul li a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+
+.chat-sidebar form {
+  margin-top: 20px;
+}
+
+.chat-sidebar input[type="text"] {
+  width: 80%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.chat-sidebar .btn {
+  margin-top: 10px;
+}
+
+.chat-main {
+  margin-left: 22%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.chat-messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-bottom: 20px;
+}
+
+.chat-message {
+  margin-bottom: 10px;
+}
+
+.user-message {
+  background-color: #d9edf7;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.bot-message {
+  background-color: #f7f7f9;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.chat-form {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  width: 80%;
+  background-color: white;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.chat-form input[type="text"] {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.chat-form .btn {
+  margin-left: 10px;
+}
+
+/* == Вакансии == */
+.vacancies-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.vacancy-card {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+  width: 80%;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.vacancy-card p {
+  margin: 5px 0;
+}
+
+/* == Поиск и сортировка == */
+.search-form {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.form-input {
+  padding: 10px;
+  width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* Пробел между кнопками */
+}
+
+/* == Сортировка кнопок == */
+.sort-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center; /* Выравнивает по вертикали */
+  margin-top: 20px;
+}
+
+.sort-buttons .btn {
+  width: 150px; /* Одинаковая ширина для кнопок сортировки */
+  border: none; /* Убираем любые границы */
+  box-shadow: none;
+  outline: none;
+}
+
+/* == Пагинация == */
+.pagination {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.pagination-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* Расстояние между кнопками */
+}
+
+.pagination-buttons .btn {
+  background-color: #007bff;
+}
+
+.pagination-buttons .btn:hover {
+  background-color: #0056b3;
+}
+
+/* == Общие элементы форм == */
+.form {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-input {
+  width: 80%;
+  max-width: 400px;
+}
+
+/* == Спиннер == */
+#loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2em;
+  color: #5cb85c;
+  padding: 20px;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #5cb85c;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* == Форма создания комнаты чата == */
+.create-room-form {
+  margin-top: 20px;
+}
+
+.create-room-form input[type="text"] {
+  width: 80%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.create-room-form .btn {
+  margin-top: 10px;
+}
+
+/* == Чат-комнаты: выравнивание текста и кнопки Delete == */
+.chat-room-item {
+  display: flex;
+  justify-content: space-between; /* Разделяет текст и кнопку */
+  align-items: center; /* Выравнивает текст и кнопку по вертикали */
+  margin-bottom: 10px;
+}
+
+.chat-room-name {
+  flex-grow: 1; /* Занимает оставшееся пространство */
+}
+
+/* == Дополнительные правки == */
+/* Убираем дублирование стилей кнопок */
+button,
+.btn {
+  /* Если есть кнопки без класса .btn, применяем к ним базовые стили */
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  transition: background-color 0.3s ease;
+}
+
+button:hover,
+.btn:hover {
+  /* Общий ховер эффект */
+  opacity: 0.9;
+}

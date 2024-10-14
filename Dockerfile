@@ -28,6 +28,8 @@ COPY --chown=${USER} ./templates templates
 COPY --chown=${USER} ./model model
 COPY --chown=${USER} ./parsing_scripts parsing_scripts
 COPY --chown=${USER} ./utils utils
+COPY --chown=${USER} ./static static
+
 USER ${USER}
 
 ENTRYPOINT ["uvicorn", "main:app"]

@@ -1,15 +1,43 @@
+import logging
+
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
-from langchain_openai import OpenAIEmbeddings
-from langchain_openai.chat_models.base import ChatOpenAI
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_qdrant import Qdrant
 
 from utils.utils import initialize_qdrant_client, openai_key
 
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+def get_last_100_documents(qdrant_client, collection_name: str = "csv-collection1", limit: int = 100):
+    """Извлечение последних 100 документов из коллекции."""
+    try:
+        logger.info(f"Извлечение последних {limit} документов из коллекции: {collection_name}.")
+        search_result = qdrant_client.scroll(
+            collection_name=collection_name,
+            limit=limit,
+        )
+
+        points, next_offset = search_result
+        if not points:
+            logger.warning("Нет документов в коллекции.")
+            return []
+
+        return points
+
+    except Exception as e:
+        logger.exception(f"Ошибка при извлечении документов: {e}")
+        return []
+
 
 def create_retrieval_qa(qdrant_client: Qdrant, collection_name: str = "csv-collection1") -> RetrievalQA:
+    logger.info("Инициализация эмбеддингов OpenAI.")
     embeddings = OpenAIEmbeddings(openai_api_key=openai_key)
 
+    logger.info(f"Подключение к Qdrant коллекции: {collection_name}.")
     vectorstore = Qdrant(
         client=qdrant_client,
         collection_name=collection_name,
@@ -17,19 +45,25 @@ def create_retrieval_qa(qdrant_client: Qdrant, collection_name: str = "csv-colle
         content_payload_key="page_content",
     )
 
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
+    logger.info("Инициализация модели ChatOpenAI.")
+    llm = ChatOpenAI(
+        openai_api_key=openai_key,
+        model="gpt-4",
+        temperature=0.3,
+        request_timeout=60,
+    )
 
-    llm = ChatOpenAI(openai_api_key=openai_key, model="gpt-4o", temperature=0.5)
-
+    # Обновленный и улучшенный промпт
     prompt_template = """
-    Используя предоставленные данные, ответь на следующий вопрос максимально подробно и точно.
+    Ты — AI-ассистент, который предоставляет краткие, точные и информативные ответы на основе предоставленных данных.
     Даты указаны в формате ДД.ММ.ГГГГ.
 
     Вопрос: {question}
 
-    Данные:
+    Контекст данных:
     {context}
 
+    Предоставь краткий и точный ответ на основе контекста.
     Ответ:
     """
 
@@ -38,21 +72,44 @@ def create_retrieval_qa(qdrant_client: Qdrant, collection_name: str = "csv-colle
         input_variables=["context", "question"],
     )
 
+    logger.info("Создание RetrievalQA цепочки с типом 'stuff'.")
     return RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
-        retriever=retriever,
+        retriever=vectorstore.as_retriever(),
         chain_type_kwargs={"prompt": prompt},
         return_source_documents=True,
     )
 
 
-def data_chat(question: str) -> str:
-    qdrant_client = initialize_qdrant_client()
-    qa_chain = create_retrieval_qa(qdrant_client)
+def data_chat(question: str):
+    """Запуск цепочки QA для ответа на вопрос с использованием последних 100 документов."""
+    try:
+        logger.info(f"Получен вопрос: {question}")
+        qdrant_client = initialize_qdrant_client()
 
-    response = qa_chain.invoke({"query": question})
-    result = response["result"]
-    response["source_documents"]
+        # Извлечение последних 100 документов
+        documents = get_last_100_documents(qdrant_client, "csv-collection1", limit=100)
 
-    return result
+        if not documents:
+            logger.warning("Нет документов в коллекции.")
+            return "Нет документов для обработки.", []
+
+        logger.info(f"Количество извлеченных документов: {len(documents)}")
+
+        qa_chain = create_retrieval_qa(qdrant_client)
+        logger.info("QA цепочка успешно создана.")
+
+        # Контекст для модели на основе последних 100 документов
+        context = "\n".join([doc.payload["page_content"] for doc in documents])
+
+        logger.info("Выполнение запроса к QA цепочке.")
+        response = qa_chain.invoke({"query": question, "context": context})
+        result = response["result"]
+
+        logger.info(f"Ответ получен: {result}")
+
+        return result, documents
+    except Exception as e:
+        logger.exception(f"Ошибка в data_chat: {e}")
+        raise
