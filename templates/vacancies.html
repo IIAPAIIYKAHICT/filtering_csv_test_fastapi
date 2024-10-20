@@ -1,71 +1,94 @@
-{% extends "base.html" %} {% block title %}Job Listings{% endblock %} {% block
-page_title %}Available Job Listings{% endblock %} {% block content %}
-<form method="get" action="/vacancies" class="form search-form">
-  <input
-    type="text"
-    name="search"
-    placeholder="Search vacancies..."
-    value="{{ search if search != 'None' else '' }}"
-    class="form-input"
-  />
-  <div class="form-buttons">
-    <button type="submit" class="btn search-button">Search</button>
-    <a href="/vacancies" class="btn reset-button" style="text-decoration: none"
-      >Reset Search</a
-    >
+{% extends "base.html" %}
+
+{% block title %}
+  Job Listings
+{% endblock %}
+
+{% block page_title %}
+  Available Job Listings
+{% endblock %}
+
+{% block content %}
+  <form method="get" action="/vacancies" class="form search-form">
+    <input
+      type="text"
+      name="search"
+      placeholder="Search vacancies..."
+      value="{{ search if search != 'None' else '' }}"
+      class="form-input"
+    />
+    <label for="category">Filter by Category:</label>
+    <select name="category" class="form-input" id="category">
+      <option value="">All Categories</option>
+      {% for category in categories %}
+        <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>
+          {{ category }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <label for="location">Filter by Location:</label>
+    <select name="location" class="form-input" id="location">
+      <option value="">All Locations</option>
+      {% for loc in locations %}
+        <option value="{{ loc }}" {% if loc == selected_location %}selected{% endif %}>
+          {{ loc }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <div class="form-buttons">
+      <button type="submit" class="btn search-button">Search</button>
+      <a href="/vacancies" class="btn reset-button" style="text-decoration: none">Reset Filters</a>
+    </div>
+  </form>
+
+  <div class="sort-buttons">
+    <h3>Sort by:</h3>
+    {% for field in ['Date', 'Role'] %}
+      {% if sort_by == field %}
+        {% set current_order = 'asc' if order == 'desc' else 'desc' %}
+      {% else %}
+        {% set current_order = 'asc' %}
+      {% endif %}
+      <a href="/vacancies?page=1{% if search %}&search={{ search }}{% endif %}&sort_by={{ field }}&order={{ current_order }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_location %}&location={{ selected_location }}{% endif %}">
+        <button class="btn">{{ field }}</button>
+      </a>
+    {% endfor %}
   </div>
-</form>
 
-<div class="sort-buttons">
-  <h3>Sort by:</h3>
-  {% for field in ['Date Posted', 'Job Title', 'Salary'] %} {% if sort_by ==
-  field %} {% set current_order = 'asc' if order == 'desc' else 'desc' %} {%
-  else %} {% set current_order = 'asc' %} {% endif %}
-  <a
-    href="/vacancies?page=1{% if search %}&search={{ search }}{% endif %}&sort_by={{ field }}&order={{ current_order }}"
-  >
-    <button class="btn">{{ field }}</button>
-  </a>
-  {% endfor %}
-</div>
+  {% if message %}
+    <p>{{ message }}</p>
+  {% else %}
+    <div class="vacancies-list">
+      {% for record in records %}
+        <div class="vacancy-card">
+          <p><strong>Date:</strong> {{ record['Date'].strftime('%d.%m.%Y') if record['Date'] else 'Unknown' }}</p>
+          <p><strong>Role:</strong> {{ record['Role'] }}</p>
+          <p><strong>Location:</strong> {{ record['Location'] }}</p>
+          <p><strong>Category:</strong> {{ record['Category'] }}</p>
+          <p><strong>Project Description:</strong> {{ record['Project description'] }}</p>
+          <p><strong>Responsibilities:</strong> {{ record['Responsibilities'] }}</p>
+          <p><strong>Requirements:</strong> {{ record['Requirements'] }}</p>
+          <p><strong>Additional Points:</strong> {{ record['Additional points'] }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-{% if message %}
-<p>{{ message }}</p>
-{% else %}
-<div class="vacancies-list">
-  {% for record in records %}
-  <div class="vacancy-card">
-    <p>
-      <strong>Date Posted:</strong> {{ record['Date
-      Posted'].strftime('%d.%m.%Y') }}
-    </p>
-    <p><strong>Job Title:</strong> {{ record['Job Title'] }}</p>
-    <p><strong>Company Name:</strong> {{ record['Company Name'] }}</p>
-    <p><strong>Salary:</strong> {{ record['Salary'] }}</p>
-    <p><strong>Location:</strong> {{ record['Location'] }}</p>
-    <p><strong>Full Description:</strong> {{ record['Full Description'] }}</p>
+  <div class="pagination">
+    <p>Page {{ page }} of {{ total_pages }}</p>
+    <div class="pagination-buttons">
+      {% if page > 1 %}
+        <a href="/vacancies?page={{ page - 1 }}{% if search %}&search={{ search }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_location %}&location={{ selected_location }}{% endif %}">
+          <button>Previous</button>
+        </a>
+      {% endif %}
+      {% if page < total_pages %}
+        <a href="/vacancies?page={{ page + 1 }}{% if search %}&search={{ search }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_location %}&location={{ selected_location }}{% endif %}">
+          <button>Next</button>
+        </a>
+      {% endif %}
+    </div>
   </div>
-  {% endfor %}
-</div>
-{% endif %}
-
-<div class="pagination">
-  <p>Page {{ page }} of {{ total_pages }}</p>
-  <div class="pagination-buttons">
-    {% if page > 1 %}
-    <a
-      href="/vacancies?page={{ page - 1 }}{% if search %}&search={{ search }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}"
-    >
-      <button>Previous</button>
-    </a>
-    {% endif %} {% if page < total_pages %}
-    <a
-      href="/vacancies?page={{ page + 1 }}{% if search %}&search={{ search }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}"
-    >
-      <button>Next</button>
-    </a>
-    {% endif %}
-  </div>
-</div>
-
 {% endblock %}

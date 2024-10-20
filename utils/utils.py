@@ -18,8 +18,6 @@ uk_month_to_number = {
     "листопада": "11",
     "грудня": "12",
 }
-
-openai_key = "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"
 qdrant_api_key = "9iL5Cn02vtqg63UhdyDurBzqUSpY5QGaUBooVE3xc0Ix9cNWyQhuRg"
 categories = [
     ".NET",

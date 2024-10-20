@@ -5,8 +5,11 @@ import pandas as pd
 
 def load_job_data(file_path: Path):
     job_data = pd.read_csv(file_path)
-    job_data["Date Posted"] = pd.to_datetime(job_data["Date Posted"], format="%d.%m.%Y")
+    job_data["Date"] = pd.to_datetime(job_data["Date"], format="%d.%m.%Y", errors='coerce')
+    # Удаляем строки с NaT в столбце Date
+    job_data = job_data.dropna(subset=["Date"])
     return job_data
+
 
 
 def filter_and_sort_jobs(data, search=None, sort_by=None, order="desc", page=1, page_size=10):
